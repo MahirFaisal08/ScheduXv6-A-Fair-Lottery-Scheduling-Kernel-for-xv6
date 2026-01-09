@@ -91,7 +91,7 @@ make qemu
 ```
 ---
 
-### 🎮 Run the Lottery Scheduler Test  
+### Run the Lottery Scheduler Test  
 
 Once xv6 is running inside QEMU:  
 ```bash
@@ -115,15 +115,13 @@ make qemu
 ```
 ---
 
-## Testing & Validation
+## 🧾 Testing & Validation  
 
 To verify **proportional CPU allocation fairness** in the lottery scheduler:
 
 1. Launch **3–4 instances** of `test_scheduler`, each with a different ticket count.  
 2. Observe that the **round count** of each process increases **in proportion to its ticket count**.  
 3. Over time, these ratios **converge**, confirming fair and unbiased scheduling behavior.  
-
-**Demo Reference:** [YouTube Simulation](https://youtu.be/C_23aVfG_9M)
 
 ---
 
