@@ -92,17 +92,17 @@ Once xv6 is running inside QEMU:
 $ test_scheduler
 ```
 ---
-## Also test multiple processes with different ticket counts:
+### Test with Multiple Processes  
 ```bash
 $ test_scheduler 10 &
 $ test_scheduler 5 &
 $ test_scheduler 2 &
 ```
-## Exit the Emulator
+**Exit the Emulator:**
 ```bash
 Ctrl + A → X
 ```
-## Rebuild if Needed
+**Rebuild if Needed:**
 ```bash
 make clean
 make qemu
