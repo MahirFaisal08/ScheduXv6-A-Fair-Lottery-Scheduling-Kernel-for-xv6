@@ -53,7 +53,6 @@ the greater the chance of CPU time.
   based on the total ticket pool at runtime  
 
 ---
-
 ## Build & Run Instructions  
 
 Follow these steps to **compile and run ScheduXv6** on your system:  
@@ -63,11 +62,6 @@ Follow these steps to **compile and run ScheduXv6** on your system:
 git clone https://github.com/MahirFaisal08/ScheduXv6-A-Fair-Lottery-Scheduling-Kernel-for-xv6.git
 cd ScheduXv6-A-Fair-Lottery-Scheduling-Kernel-for-xv6
 ```
----
-## Build & Run Instructions  
-
-Follow these steps to **compile and run ScheduXv6** on your system:  
-
 ---
 
 ### Prerequisites  
