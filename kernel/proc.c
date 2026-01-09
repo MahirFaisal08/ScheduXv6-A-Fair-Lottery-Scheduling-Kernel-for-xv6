@@ -5,6 +5,8 @@
 #include "spinlock.h"
 #include "proc.h"
 #include "defs.h"
+#include "rand.h"
+
 
 struct cpu cpus[NCPU];
 
@@ -124,6 +126,9 @@ allocproc(void)
 found:
   p->pid = allocpid();
   p->state = USED;
+
+  p->tickets = 10;
+  p->rounds = 0;
 
   // Allocate a trapframe page.
   if((p->trapframe = (struct trapframe *)kalloc()) == 0){
@@ -301,6 +306,8 @@ kfork(void)
   acquire(&np->lock);
   np->state = RUNNABLE;
   release(&np->lock);
+  np->tickets = p->tickets;
+  np->rounds = 0;
 
   return pid;
 }
@@ -421,46 +428,133 @@ kwait(uint64 addr)
 //  - swtch to start running that process.
 //  - eventually that process transfers control
 //    via swtch back to the scheduler.
+
+
 void
+
+
 scheduler(void)
+
+
 {
-  struct proc *p;
+
   struct cpu *c = mycpu();
 
+  struct proc *p;
+
+
   c->proc = 0;
+
+
+
   for(;;){
-    // The most recent process to run may have had interrupts
-    // turned off; enable them to avoid a deadlock if all
-    // processes are waiting. Then turn them back off
-    // to avoid a possible race between an interrupt
-    // and wfi.
+
     intr_on();
-    intr_off();
 
-    int found = 0;
-    for(p = proc; p < &proc[NPROC]; p++) {
+
+
+    int total = 0;
+
+
+    for(p = proc; p < &proc[NPROC]; p++){
+
       acquire(&p->lock);
-      if(p->state == RUNNABLE) {
-        // Switch to chosen process.  It is the process's job
-        // to release its lock and then reacquire it
-        // before jumping back to us.
-        p->state = RUNNING;
-        c->proc = p;
-        swtch(&c->context, &p->context);
 
-        // Process is done running for now.
-        // It should have changed its p->state before coming back.
-        c->proc = 0;
-        found = 1;
+      if(p->state == RUNNABLE){
+
+        total += p->tickets;
+
+
+
       }
+
       release(&p->lock);
+
     }
-    if(found == 0) {
-      // nothing to run; stop running on this core until an interrupt.
+
+
+
+
+
+    if(total == 0){
+
+
       asm volatile("wfi");
+
+
+
+      continue;
+
+
     }
+
+
+
+    int draw = rand() % total;
+
+
+    int count = 0;
+
+
+
+    for(p = proc; p < &proc[NPROC]; p++){
+
+
+      acquire(&p->lock);
+
+
+      if(p->state == RUNNABLE){
+
+
+        count += p->tickets;
+
+
+        if(count > draw){
+
+
+          p->state = RUNNING;
+
+          c->proc = p;
+
+
+          p->rounds++;
+
+
+          swtch(&c->context, &p->context);
+
+
+          c->proc = 0;
+
+
+          release(&p->lock);
+
+
+          break;
+
+
+        }
+
+
+      }
+
+
+      release(&p->lock);
+
+
+    }
+
+
   }
+
+
+
+
 }
+
+
+
+
+
 
 // Switch to scheduler.  Must hold only p->lock
 // and have changed proc->state. Saves and restores
@@ -662,29 +756,86 @@ either_copyin(void *dst, int user_src, uint64 src, uint64 len)
 // Print a process listing to console.  For debugging.
 // Runs when user types ^P on console.
 // No lock to avoid wedging a stuck machine further.
+
+
 void
+
+
 procdump(void)
+
+
 {
+
+
   static char *states[] = {
-  [UNUSED]    "unused",
-  [USED]      "used",
-  [SLEEPING]  "sleep ",
-  [RUNNABLE]  "runble",
-  [RUNNING]   "run   ",
-  [ZOMBIE]    "zombie"
+
+    [UNUSED] "unused",
+
+    [USED] "used",
+
+
+    [SLEEPING] "sleep",
+
+    [RUNNABLE] "runnable",
+
+    [RUNNING] "running",
+
+
+    [ZOMBIE] "zombie"
+
+
+
   };
+
+
+
   struct proc *p;
+
+
   char *state;
 
-  printf("\n");
+
+  printf("\nPID\tSTATE\tTICKETS\tROUNDS\tNAME\n");
+
+
+
   for(p = proc; p < &proc[NPROC]; p++){
+
+
+
+
     if(p->state == UNUSED)
+
+
       continue;
-    if(p->state >= 0 && p->state < NELEM(states) && states[p->state])
+
+
+    if(p->state >= 0 && p->state < NELEM(states))
+
       state = states[p->state];
+
+
+
     else
+
       state = "???";
-    printf("%d %s %s", p->pid, state, p->name);
-    printf("\n");
+
+
+
+    printf("%d\t%s\t%d\t%d\t%s\n", p->pid, state, p->tickets, p->rounds, p->name);
+
+
+
+
+
+
   }
+
+
+
 }
+
+
+
+
+

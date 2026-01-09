@@ -107,3 +107,38 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
+
+
+
+uint64
+
+
+sys_settickets(void)
+
+
+{
+
+
+    int ticket_value;
+
+
+    argint(0, &ticket_value);
+
+
+    struct proc *curr = myproc();
+
+
+    if(ticket_value < 1)
+        return -1;
+
+
+    curr->tickets = ticket_value;
+
+    return 0;
+
+
+}
+
+
+
