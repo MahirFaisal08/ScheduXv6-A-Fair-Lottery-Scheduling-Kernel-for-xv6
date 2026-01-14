@@ -121,11 +121,11 @@ To verify **proportional CPU allocation fairness** in the lottery scheduler:
 
 ## Future Improvements
 
-- 🔹 Add **multi-core scheduling support** for CPU > 1  
-- 🔹 Implement **dynamic ticket redistribution**  
-- 🔹 Extend algorithm for **weighted I/O-bound processes**  
-- 🔹 Add **visualization module** for scheduling outcomes  
-- 🔹 Explore **hybrid (lottery + stride) scheduling** for finer fairness
+- Add **multi-core scheduling support** for CPU > 1  
+- Implement **dynamic ticket redistribution**  
+- Extend algorithm for **weighted I/O-bound processes**  
+- Add **visualization module** for scheduling outcomes  
+- Explore **hybrid (lottery + stride) scheduling** for finer fairness
 
 ---
 
